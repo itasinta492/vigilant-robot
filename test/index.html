@@ -318,7 +318,7 @@ layout: null
 <p>Welcome to my travel blog about Albania, a hidden gem in Southeast Europe. Albania offers beautiful beaches, amazing mountains, historic cities, and rich cultural heritage. In this blog, you will find interesting places such as the Albanian Riviera, Berat, and Theth National Park. Albania is a perfect destination for travelers who love nature, history, and adventure.</p>
 <br />
         <!-- LATEST POSTS -->
-        {% assign latest_posts = site.categories.pisah01a | limit: 99 %}
+        {% assign latest_posts = site.categories.pisah01a | limit: 15 %}
         {% if latest_posts.size > 0 %}
         <div class="latest-section">
             <div class="section-title"><span>Latest Posts</span></div>
@@ -341,7 +341,7 @@ layout: null
         {% endif %}
 
         <!-- POPULAR POSTS -->
-        {% assign popular_posts = site.categories.pisah01b | limit: 99 %}
+        {% assign popular_posts = site.categories.pisah01b | limit: 15 %}
         {% if popular_posts.size > 0 %}
         <div class="popular-section">
             <div class="section-title"><span>Popular Posts</span></div>
@@ -406,7 +406,7 @@ layout: null
     <!-- Grid Posts -->
     <div class="home-featured-grid">
 
-        {% for post in site.categories.pisah01 limit:5 offset:1 %}
+        {% for post in site.categories.pisah01 limit:4 offset:1 %}
         <div class="home-grid-card">
 
             {% if post.image %}
