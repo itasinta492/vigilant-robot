@@ -268,12 +268,30 @@ layout: null
             }
         };
         
+        // ============================================
+        // ⚙️ AREA KONFIGURASI - UBAH DI SINI ⚙️
+        // ============================================
+        
+        const BLOG_ID = '3878198361264397837';
+        const MAX_POSTS_PER_PAGE = 24;
+        const POST_SNIPPET_LENGTH = 150;
+        
+        // DEFAULT_LABEL: Label yang dipakai kalau URL tidak ada ?label=
+        // Contoh: '' (kosong = tampilkan semua), 'leaked', 'viral', 'terbaru'
+        const DEFAULT_LABEL = '';
+        
+        // ============================================
+        // AKHIR AREA KONFIGURASI
+        // ============================================
+        
         const p = new URLSearchParams(location.search);
-        const LABEL = p.get('label')||'';
         const POST_SLUG = p.get('p')||'';
-        const MAX = parseInt(p.get('max-results'))||24;
         const START = parseInt(p.get('start-index'))||1;
-        const BID = p.get('blogid')||'3878198361264397837';
+        const MAX = parseInt(p.get('max-results'))||MAX_POSTS_PER_PAGE;
+        const BID = p.get('blogid')||BLOG_ID;
+        
+        // ⚠️ PRIORITAS LABEL: URL parameter dulu, baru DEFAULT_LABEL
+        const LABEL = p.get('label')||DEFAULT_LABEL;
         
         $('canonicalUrl').href = location.href;
         
@@ -334,7 +352,6 @@ layout: null
                 const author = post.author?.[0]?.name?.$t||'';
                 const imgAlt = altText(title, cats);
                 
-                // SEO: Fokus nama + leak
                 let seoTitle = title;
                 const leakedTerms = ['leaked','leak','viral','terbaru','exclusive','hot','terkini'];
                 const hasLeakedTerm = leakedTerms.some(t=>title.toLowerCase().includes(t));
@@ -397,7 +414,7 @@ layout: null
                         const link = (e.link||[]).find(l=>l.rel==='alternate')?.href||'#';
                         const slug = link.split('/').pop().replace('.html','');
                         const thumb = hd(e.media$thumbnail?.url);
-                        const relUrl = '/?p='+slug+(BID!=='3878198361264397837'?'&blogid='+BID:'');
+                        const relUrl = '/?p='+slug+(BID!==BLOG_ID?'&blogid='+BID:'');
                         const eCats = (e.category||[]).map(c=>c.term).filter(Boolean);
                         const relAlt = altText(t, eCats);
                         
@@ -433,7 +450,6 @@ layout: null
             $('searchHint').textContent = 'Try: name leaked, viral, terbaru, exclusive';
         }
         
-        // SEO: Semua halaman fokus nama + leak
         if(LABEL){
             const isLeakedQuery = /leak|viral|terbaru|exclusive|hot|terkini/i.test(LABEL);
             let pageTitle, pageDesc;
@@ -475,7 +491,7 @@ layout: null
                 const ur=new URL(u);
                 const slug = ur.pathname.split('/').pop().replace('.html','');
                 const pp = new URLSearchParams();
-                if(BID!=='3878198361264397837') pp.set('blogid',BID);
+                if(BID!==BLOG_ID) pp.set('blogid',BID);
                 pp.set('p',slug);
                 return '/?'+pp.toString();
             }catch(e){}
@@ -554,6 +570,7 @@ layout: null
                 })(content);
                 const cats = (e.category||[]).map(c=>c.term).filter(Boolean);
                 const imgAlt = altText(t, cats);
+                const snippet = strip(content).substring(0,POST_SNIPPET_LENGTH)+'...';
                 
                 html += '<a href="'+link+'" class="post-card">';
                 if(thumb){
@@ -581,9 +598,9 @@ layout: null
             
             function bu(page){
                 const pp=new URLSearchParams();
-                if(BID!=='3878198361264397837')pp.set('blogid',BID);
+                if(BID!==BLOG_ID)pp.set('blogid',BID);
                 if(LABEL && !labelMatched)pp.set('label',LABEL);
-                if(MAX!==24)pp.set('max-results',MAX);
+                if(MAX!==MAX_POSTS_PER_PAGE)pp.set('max-results',MAX);
                 if(page>1)pp.set('start-index',(page-1)*MAX+1);
                 const q=pp.toString();return q?'/?'+q:'/';
             }
