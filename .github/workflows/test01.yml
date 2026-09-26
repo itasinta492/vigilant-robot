@@ -1,8 +1,8 @@
-name: Mirror Upstream (Force Except Workflows index & Robots)
+name: Mirror Upstream (Force Except Workflows)
 
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 permissions:
@@ -13,62 +13,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout fork
+      - name: Checkout fork (main)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: master
+          ref: main
 
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Save local workflows, robots & index
+      - name: Save local workflows
         run: |
-          mkdir -p /tmp/backup
-          
+          mkdir -p /tmp/workflows
           if [ -d ".github/workflows" ]; then
-            cp -r .github/workflows /tmp/backup/
-          fi
-          
-          if [ -f "functions/robots.txt.js" ]; then
-            mkdir -p /tmp/backup/functions
-            cp functions/robots.txt.js /tmp/backup/functions/
-          fi
-
-          if [ -f "index.html" ]; then
-            cp index.html /tmp/backup/
+            cp -r .github/workflows /tmp/workflows/
           fi
 
       - name: Add upstream
         run: |
-          git remote add upstream https://github.com/nengmaya538/nengmaya538.github.io.git || true
+          git remote add upstream https://github.com/raisfz/pisah19.git
           git fetch upstream
 
-      - name: Hard reset to upstream
+      - name: Hard reset to upstream master
         run: |
           git reset --hard upstream/master
 
-      - name: Restore workflows, robots & index
+      - name: Restore workflows
         run: |
           rm -rf .github/workflows
-          if [ -d "/tmp/backup/workflows" ]; then
+          if [ -d "/tmp/workflows/workflows" ]; then
             mkdir -p .github
-            cp -r /tmp/backup/workflows .github/
+            cp -r /tmp/workflows/workflows .github/
           fi
 
-          if [ -f "/tmp/backup/functions/robots.txt.js" ]; then
-            mkdir -p functions
-            cp /tmp/backup/functions/robots.txt.js functions/
-          fi
-
-          if [ -f "/tmp/backup/index.html" ]; then
-            cp /tmp/backup/index.html index.html
-          fi
-
-      - name: Force push to fork
+      - name: Force push to main
         run: |
           git add .
-          git commit -m "Force sync except workflows, robots & index.html" || echo "No changes"
-          git push origin master --force
+          git commit -m "Force sync from upstream/master to main (except workflows)" || echo "No changes"
+          git push origin main --force
